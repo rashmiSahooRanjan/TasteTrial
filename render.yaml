@@ -4,7 +4,7 @@ services:
   # -------------------------------------------------------------
   - type: web
     name: tastetrial-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: backend
     buildCommand: npm install
@@ -35,23 +35,16 @@ services:
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: tastetrial-frontend
-          property: host
+        sync: false
       - key: ADMIN_FRONTEND_URL
-        fromService:
-          type: web
-          name: tastetrial-admin
-          property: host
+        sync: false
 
   # -------------------------------------------------------------
   # 2. Main Client Frontend (React + Vite)
   # -------------------------------------------------------------
   - type: web
     name: tastetrial-frontend
-    env: static
-    plan: free
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
@@ -62,10 +55,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_SERVER_URL
-        fromService:
-          type: web
-          name: tastetrial-backend
-          property: host
+        sync: false
       - key: VITE_GEOAPIKEY
         sync: false
       - key: VITE_RAZORPAY_KEY_ID
@@ -80,8 +70,7 @@ services:
   # -------------------------------------------------------------
   - type: web
     name: tastetrial-admin
-    env: static
-    plan: free
+    runtime: static
     rootDir: admin/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
@@ -92,7 +81,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_BACKEND_URL
-        fromService:
-          type: web
-          name: tastetrial-backend
-          property: host
+        sync: false

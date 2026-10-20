@@ -1,0 +1,98 @@
+services:
+  # -------------------------------------------------------------
+  # 1. Main Backend API Service (Node / Express / Socket.IO)
+  # -------------------------------------------------------------
+  - type: web
+    name: tastetrial-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: EMAIL
+        sync: false
+      - key: PASS
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: tastetrial-frontend
+          property: host
+      - key: ADMIN_FRONTEND_URL
+        fromService:
+          type: web
+          name: tastetrial-admin
+          property: host
+
+  # -------------------------------------------------------------
+  # 2. Main Client Frontend (React + Vite)
+  # -------------------------------------------------------------
+  - type: web
+    name: tastetrial-frontend
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_SERVER_URL
+        fromService:
+          type: web
+          name: tastetrial-backend
+          property: host
+      - key: VITE_GEOAPIKEY
+        sync: false
+      - key: VITE_RAZORPAY_KEY_ID
+        sync: false
+      - key: VITE_FIREBASE_APIKEY
+        sync: false
+      - key: VITE_GEMINI_API_KEY
+        sync: false
+
+  # -------------------------------------------------------------
+  # 3. Admin Panel Frontend (React + Vite)
+  # -------------------------------------------------------------
+  - type: web
+    name: tastetrial-admin
+    env: static
+    plan: free
+    rootDir: admin/frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: tastetrial-backend
+          property: host

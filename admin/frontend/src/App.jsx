@@ -33,8 +33,12 @@ function App() {
     const authCheckRef = useRef(false);
 
     useEffect(() => {
-        // Skip auth check on login and forgot-password pages to prevent redirect loops
-        if (location.pathname === "/admin/login" || location.pathname === "/admin/forgot-password") {
+        // Skip auth check on public routes or root to prevent redirect/reload loops
+        if (
+            location.pathname === "/admin/login" ||
+            location.pathname === "/admin/forgot-password" ||
+            location.pathname === "/"
+        ) {
             return;
         }
         
@@ -43,6 +47,11 @@ function App() {
         authCheckRef.current = true;
 
         const checkAuth = async () => {
+            const token = localStorage.getItem("adminToken");
+            if (!token) {
+                dispatch(clearAdminData());
+                return;
+            }
             try {
                 const { data } = await getAdminProfile();
                 if (data) {
@@ -60,6 +69,11 @@ function App() {
 
     return (
         <Routes>
+            {/* Root redirect */}
+            <Route path="/" element={
+                <Navigate to={isAuthenticated ? "/admin/dashboard" : "/admin/login"} replace />
+            } />
+
             {/* Auth Routes */}
             <Route path="/admin/login" element={
                 isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <Login />
@@ -94,7 +108,7 @@ function App() {
             </Route>
 
             {/* Default redirect */}
-            <Route path="*" element={<Navigate to="/admin/login" replace />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/admin/dashboard" : "/admin/login"} replace />} />
         </Routes>
     );
 }

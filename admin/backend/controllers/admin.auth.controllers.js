@@ -38,7 +38,8 @@ export const adminLogin = async (req, res) => {
             fullName: admin.fullName,
             email: admin.email,
             role: admin.role,
-            profileImage: admin.profileImage
+            profileImage: admin.profileImage,
+            token
         });
     } catch (error) {
         return res.status(500).json({ message: `Admin login error: ${error.message}` });

@@ -26,6 +26,9 @@ const Login = () => {
         setLoading(true);
         try {
             const { data } = await adminLogin(formData);
+            if (data.token) {
+                localStorage.setItem("adminToken", data.token);
+            }
             dispatch(setAdminData(data));
             toast.success("Welcome back, " + data.fullName);
             navigate("/admin/dashboard");

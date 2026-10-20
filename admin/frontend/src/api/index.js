@@ -13,14 +13,31 @@ const API = axios.create({
     }
 });
 
+// Request interceptor: attach Bearer token if present
+API.interceptors.request.use((config) => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => Promise.reject(error));
+
 // Response interceptor
 API.interceptors.response.use(
     (response) => response,
     (error) => {
-        const message = error.response?.data?.message || "Something went wrong";
         if (error.response?.status === 401) {
-            // Redirect to login
-            window.location.href = "/admin/login";
+            localStorage.removeItem("adminToken");
+            localStorage.removeItem("adminData");
+            // Only redirect if NOT already on login or forgot-password to prevent reload loops
+            const currentPath = window.location.pathname;
+            if (
+                currentPath.startsWith("/admin") &&
+                currentPath !== "/admin/login" &&
+                currentPath !== "/admin/forgot-password"
+            ) {
+                window.location.href = "/admin/login";
+            }
         }
         return Promise.reject(error);
     }

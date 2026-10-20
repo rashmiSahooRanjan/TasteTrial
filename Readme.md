@@ -802,6 +802,7 @@ const allowedOrigins = [
 | Name                          | Role      |
 | ----------------------------- | --------- |
 | **Rashmi Ranjan Sahoo** | Developer |
+| **Subhrajit Das**       | Developer |
 | **Densi Thumahar**      | Developer |
 
 ---
